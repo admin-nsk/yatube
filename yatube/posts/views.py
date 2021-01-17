@@ -9,4 +9,3 @@ def index(request):
         output.append(item.text)
     return render(request, 'index.html', {"posts": latest})
 
-
