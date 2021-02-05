@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'posts',
     'group',
     'Users',
+    'django.contrib.sites',
+    'django.contrib.flatpages',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -141,3 +143,5 @@ EMAIL_BACKEND = 'django.core.mail.backends.XXX'
 
 EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, "sent_emails")
+
+SITE_ID = 1
