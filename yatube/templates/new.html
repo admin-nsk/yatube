@@ -1,13 +1,13 @@
 {% extends "base.html" %}
-{% block title %}Добавить пост{% endblock %}
-{% block header %}Добавить пост{% endblock %}
+{% block title %}{% if new %}Добавить{% else %}Редактировать{% endif %} пост{% endblock %}
+{% block header %}{% if new %}Добавить{% else %}Редактировать{% endif %} пост{% endblock %}
 {% block content %}
 
 
 <div class="row justify-content-center">
     <div class="col-md-8 p-5">
         <div class="card">
-            <div class="card-header">Добавить пост</div>
+            <div class="card-header">{% if new %}Добавить{% else %}Редактировать{% endif %} пост</div>
             <div class="card-body">
 
               {% for error in form.errors %}
@@ -36,7 +36,7 @@
 
                     <div class="col-md-6 offset-md-4">
                             <button type="submit" class="btn btn-primary">
-                                Добавить
+                                {% if new %}Добавить{% else %}Сохранить{% endif %}
                             </button>
                     </div>
                 </form>
