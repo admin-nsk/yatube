@@ -33,7 +33,8 @@ class TestPosts(TestCase):
 
     def test_fail_create_post(self):
         self.client.login(username='test', password='12345', follow=True)
-        response = self.client.post('/auth/login/?next=/new/', {'text': 'test post for testuser'}, follow=True)
+        response = self.client.post('/new/', {'text': 'test post for testuser'}, follow=True)
+        self.assertRedirects(response, '/auth/login/?next=/new/', status_code=302, target_status_code=200)
 
     def test_newpost_on_index(self):
         posts = self.user.posts.all()
