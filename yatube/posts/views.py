@@ -1,5 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
+from django.http import Http404
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 
@@ -29,21 +30,28 @@ def new_post(request):
 
 
 def profile(request, username):
-    author = User.objects.get(username=username)
-    posts = Post.objects.filter(author=author)
-    paginator = Paginator(posts, 10)
-    page_number = request.GET.get('page')
-    page = paginator.get_page(page_number)
+    try:
+        author = User.objects.get(username=username)
+        posts = Post.objects.filter(author=author)
+        paginator = Paginator(posts, 10)
+        page_number = request.GET.get('page')
+        page = paginator.get_page(page_number)
+    except User.DoesNotExist:
+        raise Http404("Страница не найдена")
     return render(request, 'profile.html', {'author': author, 'page': page, 'count': paginator.count })
 
 
 def post_view(request, username, post_id):
-    author = User.objects.get(username=username)
-    posts = Post.objects.filter(author=author).count()
-    post = Post.objects.get(pk=post_id)
+    try:
+        author = User.objects.get(username=username)
+        posts = Post.objects.filter(author=author).count()
+        post = Post.objects.get(pk=post_id)
+    except User.DoesNotExist:
+        raise Http404("Страница не найдена")
     return render(request, 'post.html', {'author': author, 'post': post, 'count': posts})
 
 
+@login_required
 def post_edit(request, username, post_id):
     author = User.objects.get(username=username)
     post = Post.objects.get(pk=post_id)
@@ -65,3 +73,15 @@ def post_edit(request, username, post_id):
         else:
             return redirect(f'/{username}/{post_id}/')
 
+
+def page_not_found(request, exception):
+    return render(
+        request,
+        "misc/404.html",
+        {"path": request.path},
+        status=404
+    )
+
+
+def server_error(request):
+    return render(request, "misc/500.html", status=500)
