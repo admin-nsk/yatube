@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.http import Http404
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 
 from .models import Post, User
@@ -24,54 +24,40 @@ def new_post(request):
             form.instance.author = request.user
             form.save()
             return redirect('index')
-        return render(request, 'new.html', {'form': form, 'new': True})
+        return render(request, 'new.html', {'form': form, 'post': None})
     form = PostForm()
-    return render(request, 'new.html', {'form': form, 'new': True})
+    return render(request, 'new.html', {'form': form, 'post': None})
 
 
 def profile(request, username):
-    try:
-        author = User.objects.get(username=username)
-        posts = Post.objects.filter(author=author)
-        paginator = Paginator(posts, 10)
-        page_number = request.GET.get('page')
-        page = paginator.get_page(page_number)
-    except User.DoesNotExist:
-        raise Http404("Страница не найдена")
+    author = get_object_or_404(User, username=username)
+    posts = Post.objects.filter(author=author)
+    paginator = Paginator(posts, 10)
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
     return render(request, 'profile.html', {'author': author, 'page': page, 'count': paginator.count })
 
 
 def post_view(request, username, post_id):
-    try:
-        author = User.objects.get(username=username)
-        posts = Post.objects.filter(author=author).count()
-        post = Post.objects.get(pk=post_id)
-    except User.DoesNotExist:
-        raise Http404("Страница не найдена")
+    author = get_object_or_404(User, username=username)
+    posts = Post.objects.filter(author=author).count()
+    post = get_object_or_404(Post, pk=post_id)
     return render(request, 'post.html', {'author': author, 'post': post, 'count': posts})
 
 
 @login_required
 def post_edit(request, username, post_id):
-    author = User.objects.get(username=username)
-    post = Post.objects.get(pk=post_id)
-    # тут тело функции. Не забудьте проверить,
-    # что текущий пользователь — это автор записи.
+    author = get_object_or_404(User, username=username)
+    post = get_object_or_404(Post, pk=post_id, author=author)
+    if request.user != author:
+        return redirect("post", username=username, post_id=post_id)
+
+    form = PostForm(request.POST or None, files=request.FILES or None, instance=post)
     if request.method == 'POST':
-        form = PostForm(request.POST, instance=post)
         if form.is_valid():
-            if form.has_changed():
-                form.instance.author = author
-                form.save()
-                return redirect('index')
-        else:
-            return render(request, 'new.html', {'form': form, 'new': False})
-    else:
-        if request.user.username == post.author.username:
-            form = PostForm(instance=post)
-            return render(request, 'new.html', {'form': form, 'new': False})
-        else:
-            return redirect(f'/{username}/{post_id}/')
+            form.save()
+            return redirect("post", username=request.user.username, post_id=post_id)
+    return render(request, 'new.html', {'form': form, 'post': post})
 
 
 def page_not_found(request, exception):

@@ -1,13 +1,13 @@
 {% extends "base.html" %}
-{% block title %}{% if new %}Добавить{% else %}Редактировать{% endif %} пост{% endblock %}
-{% block header %}{% if new %}Добавить{% else %}Редактировать{% endif %} пост{% endblock %}
+{% block title %}{% if not post %}Добавить{% else %}Редактировать{% endif %} пост{% endblock %}
+{% block header %}{% if not post %}Добавить{% else %}Редактировать{% endif %} пост{% endblock %}
 {% block content %}
 
 
 <div class="row justify-content-center">
     <div class="col-md-8 p-5">
         <div class="card">
-            <div class="card-header">{% if new %}Добавить{% else %}Редактировать{% endif %} пост</div>
+            <div class="card-header">{% if not post%}Добавить{% else %}Редактировать{% endif %} пост</div>
             <div class="card-body">
 
               {% for error in form.errors %}
@@ -16,11 +16,11 @@
                   </div>
                 {% endfor %}
 
-                <form method="post" action="{% url 'new_post' %}">
+                <form method="post" action="{% if not post  %}{% url 'new_post' %}{% else %}{% url 'post_edit' username=post.author.username post_id=post.id %}{% endif %}" enctype="multipart/form-data">
                     {% csrf_token %}
 
                     {% for field in form %}
-                        <div class="form-group row" aria-required={% if field.field.required %}"true"{% else %}"false"{% endif %}>
+                        <div class="form-group row" aria-required='{% if field.field.required %}"true"{% else %}"false"{% endif %}'>
                                 <label for="{{ field.id_for_label }}" class="col-md-4 col-form-label text-md-right">{{ field.label }}{% if field.field.required %}<span class="required">*</span>{% endif %}</label>
                                 <div class="col-md-6">
 
@@ -36,7 +36,7 @@
 
                     <div class="col-md-6 offset-md-4">
                             <button type="submit" class="btn btn-primary">
-                                {% if new %}Добавить{% else %}Сохранить{% endif %}
+                                {% if not post %}Добавить{% else %}Сохранить{% endif %}
                             </button>
                     </div>
                 </form>
