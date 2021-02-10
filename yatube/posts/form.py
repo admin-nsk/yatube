@@ -1,5 +1,5 @@
 from django import forms
-from .models import Post
+from .models import Post, Comments
 from group.models import Group
 
 
@@ -10,3 +10,12 @@ class PostForm(forms.ModelForm):
     class Meta:
         model = Post
         fields = ('group', 'text', 'image')
+
+
+class CommentForm(forms.ModelForm):
+
+    class Meta:
+        model = Comments
+        fields = ('text',)
+        labels = {'text': 'Комментарий'}
+        widgets = {'text': forms.Textarea()}
