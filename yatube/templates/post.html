@@ -64,12 +64,7 @@
                                         <!-- Дата публикации  -->
                                         <small class="text-muted">{{ post.pub_date|date:"d M Y" }}</small>
                                 </div>
-                        </div>
-                </div>
-
-     </div>
-    </div>
-    <!-- Комментарии -->
+                                        <!-- Комментарии -->
 {% for item in items %}
 <div class="media mb-4">
 <div class="media-body">
@@ -84,6 +79,14 @@
 </div>
 
 {% endfor %}
+                        </div>
+
+                </div>
+
+     </div>
+
+    </div>
+
 </main>
 {% endblock %}
 

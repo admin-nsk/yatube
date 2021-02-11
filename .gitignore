@@ -127,3 +127,8 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+/yatube/media/test-load.js
+/yatube/media/trava-na-beregu.jpg
+/yatube/media/stock-photo-98170975.jpg
+/yatube/media/posts/
+/yatube/media/cache/

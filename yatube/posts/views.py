@@ -9,7 +9,7 @@ from .form import PostForm, CommentForm
 
 
 def index(request):
-    post_list = Post.objects.order_by('-pub_date').all()
+    post_list = Post.objects.order_by('-pub_date').select_related('author').all()
     paginator = Paginator(post_list, 10)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
@@ -31,7 +31,7 @@ def new_post(request):
 
 def profile(request, username):
     author = get_object_or_404(User, username=username)
-    posts = Post.objects.filter(author=author)
+    posts = Post.objects.select_related('author').filter(author=author)
     paginator = Paginator(posts, 10)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
@@ -40,9 +40,9 @@ def profile(request, username):
 
 def post_view(request, username, post_id):
     author = get_object_or_404(User, username=username)
-    posts = Post.objects.filter(author=author).count()
+    posts = Post.objects.select_related('author').filter(author=author).count()
     post = get_object_or_404(Post, pk=post_id)
-    comments = post.comments.all()
+    comments = post.comments.select_related('author').all()
     form = CommentForm()
     return render(request, 'post.html', {'author': author, 'post': post, 'count': posts, 'items': comments, 'form': form})
 
@@ -78,7 +78,7 @@ def server_error(request):
 def add_comment(request, username, post_id):
     author = get_object_or_404(User, username=username)
     post = get_object_or_404(Post, pk=post_id, author=author)
-    comments = post.comments.all()
+    comments = post.comments.select_related('author').all()
     if request.user != author:
         return redirect("post", username=username, post_id=post_id)
 
