@@ -1,7 +1,7 @@
 from django.test import TestCase, Client
 
 from django.urls import reverse
-
+from django.core.cache import cache
 from posts.models import Post, User
 
 
@@ -47,6 +47,7 @@ class TestPosts(TestCase):
         self.assertRedirects(response, '/auth/login/?next=/new/', status_code=302, target_status_code=200)
 
     def test_newpost_on_index(self):
+        cache.clear()
         posts = self.user.posts.all()
         for post in posts:
             for url in (
@@ -69,6 +70,7 @@ class TestPosts(TestCase):
                              'post_id': post.id,
                              }), {'text': 'Modify text in the post'}, follow=True)
                 self.assertEqual(response.status_code, 200)
+        cache.clear()
         posts_new = self.user.posts.all()
         for post in posts_new:
             for url in (
@@ -95,3 +97,14 @@ class TestPosts(TestCase):
                      'post_id': post.id,
                      }), {'text': 'Modify text in the post', 'image': img}, follow=True)
             self.assertContains(response, 'errorlist', status_code=200)
+
+    def test_cache_index_page(self):
+        if self.client.login(username=self.test_username, password=self.test_password, follow=True):
+            self.client.get('/')
+            response_post = self.client.post('/new/', {'text': 'test cache'}, follow=True)
+            self.assertEqual(response_post.status_code, 200)
+            response = self.client.get('/')
+            self.assertNotContains(response, 'test cache')
+            cache.clear()
+            response = self.client.get('/')
+            self.assertContains(response, 'test cache')

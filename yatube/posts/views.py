@@ -3,11 +3,12 @@ from django.core.paginator import Paginator
 from django.http import Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy, reverse
+from django.views.decorators.cache import cache_page
 
 from .models import Post, User, Comments
 from .form import PostForm, CommentForm
 
-
+@cache_page(20, key_prefix='index_page')
 def index(request):
     post_list = Post.objects.order_by('-pub_date').select_related('author').all()
     paginator = Paginator(post_list, 10)
