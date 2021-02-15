@@ -1,3 +1,4 @@
 # yatube
 
-This id training project for practice.
+Easy social network. 
+Project for learning Django Framework

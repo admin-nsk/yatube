@@ -5,7 +5,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy, reverse
 from django.views.decorators.cache import cache_page
 
-from .models import Post, User, Comments
+from .models import Post, User, Comments, Follow
 from .form import PostForm, CommentForm
 
 @cache_page(20, key_prefix='index_page')
@@ -36,7 +36,16 @@ def profile(request, username):
     paginator = Paginator(posts, 10)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
-    return render(request, 'profile.html', {'author': author, 'page': page, 'count': paginator.count })
+    following = Follow.objects.filter(user=request.user.id, author=author.id).exists()
+    return render(
+        request,
+        'profile.html',
+        {
+            'author': author,
+            'page': page,
+            'count': paginator.count,
+            'following': following
+        })
 
 
 def post_view(request, username, post_id):
@@ -92,3 +101,30 @@ def add_comment(request, username, post_id):
             comment.save()
             return redirect("post", username=username, post_id=post_id)
     return render(request, 'comments.html', {'form': form, 'items': comments, 'post': post})
+
+
+@login_required
+def follow_index(request):
+    user_follows = User.objects.get(pk=request.user.id).follower.all().values_list('author')
+    posts = Post.objects.select_related('author').filter(author__in=user_follows)
+    paginator = Paginator(posts, 10)
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
+    return render(request, "follow.html", {'page': page, 'paginator': paginator})
+
+
+@login_required
+def profile_follow(request, username):
+    author = get_object_or_404(User, username=username)
+    subscribe = Follow.objects.create(user=request.user, author=author)
+    subscribe.save()
+    return redirect("follow_index")
+
+
+
+@login_required
+def profile_unfollow(request, username):
+    author = get_object_or_404(User, username=username)
+    subscribe = Follow.objects.get(user=request.user.id, author=author.id)
+    subscribe.delete()
+    return redirect("follow_index")
