@@ -17,9 +17,13 @@ from django.contrib import admin
 from django.contrib.flatpages import views
 from django.urls import path, include
 from django.conf.urls import handler404, handler500
-from django.conf import settings
+from django.views.generic import TemplateView
 from django.conf.urls.static import static
 from django.conf import settings
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
 
 handler404 = "posts.views.page_not_found" # noqa
 handler500 = "posts.views.server_error" # noqa
@@ -34,8 +38,11 @@ urlpatterns = [
     path('about-spec/', views.flatpage, {'url': '/about-spec/'}, name='about-spec'),
     path("", include("posts.urls")),
     path("", include("group.urls")),
+    path("", include("api.urls")),
     path("auth/", include("Users.urls")),
     path("auth/", include("django.contrib.auth.urls")),
+    # path('api/v1/', include('api.urls')),
+    path('redoc/', TemplateView.as_view(template_name='redoc.html'), name='redoc'),
 
 ]
 
