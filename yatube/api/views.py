@@ -3,7 +3,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response
 from rest_framework import viewsets, permissions, status, generics
 from posts.models import Post, Comments, Follow
-from .serializers import PostSerializer, CommentSerializer, FollowSerializer
+from group.models import Group
+from .serializers import PostSerializer, CommentSerializer, FollowSerializer, GroupSerializer
 from .filters import PostFilters
 from .permission import IsAuthorOrReadOnlyPermission
 
@@ -97,3 +98,9 @@ class FollowAPI(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+
+class GroupAPI(generics.ListCreateAPIView):
+    queryset = Group.objects.all()
+    serializer_class = GroupSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)

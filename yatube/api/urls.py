@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import PostList, PostDetail, CommentList, CommentDetail, FollowAPI
+from .views import PostList, PostDetail, CommentList, CommentDetail, FollowAPI, GroupAPI
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -25,6 +25,7 @@ urlpatterns = [
             'delete': 'destroy'
         })),
     path('api/v1/follow/', FollowAPI.as_view(),  name='FollowApi'),
+    path('api/v1/group/', GroupAPI.as_view(),  name='GroupApi'),
     path('', include(router.urls)),
     path('api/v1/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/v1/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
