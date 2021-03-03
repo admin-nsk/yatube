@@ -86,11 +86,9 @@ def server_error(request):
 
 
 def add_comment(request, username, post_id):
-    author = get_object_or_404(User, username=username)
-    post = get_object_or_404(Post, pk=post_id, author=author)
-    comments = post.comments.select_related('author').all()
-    if request.user != author:
-        return redirect("post", username=username, post_id=post_id)
+    # author = get_object_or_404(User, username=username)
+    post = get_object_or_404(Post, pk=post_id)
+    comments = post.comments.select_related('author').filter(post=post_id)
 
     form = CommentForm(request.POST or None)
     if request.method == 'POST':
