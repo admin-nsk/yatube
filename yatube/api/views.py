@@ -1,3 +1,4 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response
@@ -13,6 +14,8 @@ class PostList(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsAuthorOrReadOnlyPermission,)
+    filter_backends = [DjangoFilterBackend, PostFilters]
+    filter_fields = ['text']
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)

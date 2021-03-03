@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'group',
     'Users',
     'api',
+    'django_filters',
     'django.contrib.sites',
     'django.contrib.flatpages',
     'django.contrib.admin',
@@ -188,7 +189,8 @@ REST_FRAMEWORK = {
     'DEFAULT_THROTTLE_RATES': {
         'user': '10000/day',  # лимит для UserRateThrottle
         'anon': '1000/day',  # лимит для AnonRateThrottle
-    }
+    },
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
 }
 
 CORS_ORIGIN_ALLOW_ALL = True
